@@ -18,7 +18,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/rogerioth/MeshGradient.git", from: "1.0.8"),
-        .package(url: "https://github.com/onevcat/RandomColorSwift.git", .branch("master"))
+        .package(url: "https://github.com/rogerioth/RandomColorSwift.git", from: "2.0.1"),
     ],
     targets: [
         .target(
