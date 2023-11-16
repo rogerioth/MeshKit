@@ -2,7 +2,7 @@
 //  MeshSize.swift
 //  
 //
-//  Created by Ethan Lipnik on 7/27/22.
+//  Created by Roger Hirooka on 11/16/23.
 //
 
 import Foundation
@@ -16,7 +16,7 @@ public struct MeshSize: Codable, Hashable {
     public var width: Int
     public var height: Int
 
-    public static var `default`: MeshSize {
+    public static var standard: MeshSize {
         return .init()
     }
 

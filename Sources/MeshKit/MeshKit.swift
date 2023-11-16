@@ -33,7 +33,7 @@ public actor MeshKit {
     
     public static func generate(palette hues: Hue...,
                                 luminosity: Luminosity = .bright,
-                                size: MeshSize = .default,
+                                size: MeshSize = .standard,
                                 withRandomizedLocations: Bool = false,
                                 locationRandomizationRange: ClosedRange<Float> = -0.2...0.2,
                                 turbulencyRandomizationRange: ClosedRange<Float> = -0.25...0.25) -> MeshColorGrid {

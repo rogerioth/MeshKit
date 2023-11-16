@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MeshGradient
 
 public struct MeshEditor: View {
     @Binding public var colors: MeshColorGrid
