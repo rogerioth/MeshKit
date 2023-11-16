@@ -19,6 +19,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/rogerioth/MeshGradient.git", from: "1.0.8"),
         .package(url: "https://github.com/rogerioth/RandomColorSwift.git", from: "2.0.1"),
+        .package(url: "https://github.com/Quick/Quick.git", from: "4.0.0"), // Quick
+        .package(url: "https://github.com/Quick/Nimble.git", from: "9.0.0"), // Nimble
     ],
     targets: [
         .target(
@@ -29,6 +31,6 @@ let package = Package(
             ]),
         .testTarget(
             name: "MeshKitTests",
-            dependencies: ["MeshKit"]),
+            dependencies: ["MeshKit", "Quick", "Nimble"]), // Add Quick and Nimble here
     ]
 )
