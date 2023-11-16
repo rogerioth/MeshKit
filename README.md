@@ -9,80 +9,78 @@ A powerful and easy to use live mesh gradient renderer for iOS, living branch of
 
 MeshKit is an easy to use live mesh gradient renderer for iOS. In just a few lines of code, you can create a mesh gradient.
 
+<video width="640" height="480" controls>
+    <source src="media/sample.mov" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+
 ## Usage
 
-You can use the `MeshView` to render the view. This basically contains a SCNView with some extra magic.
+### Quickstart
 
-##### To generate a mesh with the MeshView, you call the create method after initializing it.
+```swift
+    private let randomizer = MeshRandomizer(colorRandomizer: { _, _, _, _, _, _ in
+        return
+    })
+    private let colors: MeshColorGrid = MeshKit.generate(palette: Hue.purple, size: MeshSize(width: 4, height: 4))
+
+    public var grainAlpha: Float = MeshDefaults.grainAlpha
+    public var subdivisions: Float = Float(MeshDefaults.subdivisions)
+    public var colorSpace: CGColorSpace?
+
+    public var body: some View {
+        ZStack {
+            Mesh(colors: colors,
+                 animatorConfiguration: .init(meshRandomizer: randomizer),
+                 grainAlpha: grainAlpha,
+                 subdivisions: Int(subdivisions),
+                 colorSpace: colorSpace)
+            .edgesIgnoringSafeArea(.all)
+
+            VStack {
+            }
+        }
+    }
+```
+
+The snippet above will generate the effect seen in the video demo.
+
+### Rendering with MeshView
+MeshView is at the core of MeshKit, encapsulating an SCNView with enhanced capabilities to render mesh gradients efficiently. It's straightforward to use:
+
+#### Creating a Mesh Gradient
+To create a mesh gradient, first initialize a MeshView and add it to your view hierarchy. Then, call the create method with an array of MeshNode.Color:
 
 ```swift
 let meshView = MeshView()
 view.addSubview(meshView)
 
 meshView.create([
-                .init(point: (0, 0), location: (0, 0), color: UIColor(red: 0.149, green: 0.275, blue: 0.325, alpha: 1.000)),
-                .init(point: (0, 1), location: (0, 1), color: UIColor(red: 0.157, green: 0.447, blue: 0.443, alpha: 1.000)),
-                .init(point: (0, 2), location: (0, 2), color: UIColor(red: 0.165, green: 0.616, blue: 0.561, alpha: 1.000)),
-                
-                .init(point: (1, 0), location: (1, 0), color: UIColor(red: 0.541, green: 0.694, blue: 0.490, alpha: 1.000)),
-                .init(point: (1, 1), location: (Float.random(in: 0.3...1.8), Float.random(in: 0.3...1.5)), color: UIColor(red: 0.541, green: 0.694, blue: 0.490, alpha: 1.000)),
-                .init(point: (1, 2), location: (1, 2), color: UIColor(red: 0.914, green: 0.769, blue: 0.416, alpha: 1.000)),
-                
-                .init(point: (2, 0), location: (2, 0), color: UIColor(red: 0.957, green: 0.635, blue: 0.380, alpha: 1.000)),
-                .init(point: (2, 1), location: (2, 1), color: UIColor(red: 0.933, green: 0.537, blue: 0.349, alpha: 1.000)),
-                .init(point: (2, 2), location: (2, 2), color: UIColor(red: 0.906, green: 0.435, blue: 0.318, alpha: 1.000)),
-            ])
+    // Define your mesh points and colors here
+])
 ```
 
-This can be called as many times as you want if you ever want to change the gradient.
+You can invoke this method multiple times to update the gradient dynamically.
 
-The `MeshView.create` method needs a `MeshNode.Color` array. These are simple ways to interface with the points on the mesh gradient.
+#### Understanding `MeshNode.Color`
+Each mesh point is defined by the MeshNode.Color structure, comprising three components:
 
-##### The `Color` struct has 3 parts. `point`, `location`, and `color`.
+#### Point
+Specifies the grid position for the color, such as 0, 0 for a corner. This parameter is critical for the gradient's structure and no two colors should have the same point.
 
-`point` – Where the color should exist on the gradient. This is different from `location` as this is meant for where on the square it should exist. For example, `0, 0` is one of the corners. No interpolation is involved here.
+#### Location
+Represents the color's x and y coordinates for interpolation. Adjusting this will shift the color within the gradient. Avoid altering the location of edge points to maintain the gradient's shape.
 
-*No two colors should have the same point.*
+#### Color
+The UIColor for the point. Note that alpha values are not utilized and will be disregarded. Choose colors that blend well for a smoother gradient.
 
-`location` – Two floats on the x and y axis that will move the color and interpolate it's neighboring colors. What this basically means is where you actually want the color to go on the gradient.
+#### Configuring Mesh Dimensions
+MeshView supports customization of mesh width and height, though it's recommended to keep them equal for simplicity. The default dimensions are 3x3. If you choose to alter this, remember to provide a corresponding number of colors. For instance, a 2x2 mesh requires 4 colors, while a 4x4 mesh needs 16.
 
-*Don't change the location for the edges of the gradient or it will have a weird shape.*
-
-`color` – A UIColor for the point. Be sure to choose colors that will interpolate with each other well.
-
-*Alphas are not used and will be ignored.*
-
-##### You can also set the `width` and `height` when creating the mesh.
-
-For simplicity, the width and height should be the same. By default both are set to `3`. If you increase/decrease it, then you will need to supply the width/height **squared**. So if you set it to `2` then you will need to give it `4` colors. It would look like this
-
-```swift
-meshView.create([
-                .init(point: (0, 0), location: (0, 0), color: UIColor(red: 0.149, green: 0.275, blue: 0.325, alpha: 1.000)),
-                .init(point: (0, 1), location: (0, 1), color: UIColor(red: 0.157, green: 0.447, blue: 0.443, alpha: 1.000)),
-                
-                .init(point: (1, 0), location: (1, 0), color: UIColor(red: 0.541, green: 0.694, blue: 0.490, alpha: 1.000)),
-                .init(point: (1, 1), location: (Float.random(in: 0.3...1.8), Float.random(in: 0.3...1.5)), color: UIColor(red: 0.541, green: 0.694, blue: 0.490, alpha: 1.000)),
-]
-```
-
-If you set it to `4` then you would need to give it `16` colors and so on.
-
-##### As well as setting the width and height, you can also change the subdivisions.
-
-This is the easiest setting to change. It changes the "resolution" of the wireframe. By default it is set to `18`. Raising it will exponentially decrease performance.
-
-## Plans
-
-* More shape options
-* Easier methods to animate location changes
-* Color generating
-* Display P3 and other color profiles rendering/exporting
-* HDR support
-* More efficient rendering (Metal?)
-* macOS support
-* XCTests
+#### Adjusting Subdivisions
+You can modify the mesh's subdivisions to change its "resolution." The default setting is 18. Increasing this value can enhance detail but may affect performance.
 
 ## Acknowledgments
+Special thanks to [Moving Parts](https://movingparts.io/gradient-meshes) for their foundational work in gradient meshes.
 
-* [Moving Parts](https://movingparts.io/gradient-meshes)
+And to [EthanLipnik](https://github.com/EthanLipnik/) for creating the initial version.
