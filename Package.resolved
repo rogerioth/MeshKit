@@ -3,7 +3,7 @@
     {
       "identity" : "meshgradient",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/EthanLipnik/MeshGradient.git",
+      "location" : "https://github.com/rogerioth/MeshGradient.git",
       "state" : {
         "revision" : "6497aed1898ecc1f24a6ace6537c13bd86221a08",
         "version" : "1.0.8"
@@ -12,10 +12,10 @@
     {
       "identity" : "randomcolorswift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/EthanLipnik/RandomColorSwift.git",
+      "location" : "https://github.com/onevcat/RandomColorSwift.git",
       "state" : {
-        "revision" : "cb118928dfd40baaa31dc1bd87c97599bcf86d75",
-        "version" : "2.0.1"
+        "branch" : "master",
+        "revision" : "ab01c6eff99f40c5e23ffcb957eb3971f937f106"
       }
     }
   ],

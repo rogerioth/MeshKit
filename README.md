@@ -1,6 +1,7 @@
 # MeshKit
 
-A powerful and easy to use live mesh gradient renderer for iOS.
+A powerful and easy to use live mesh gradient renderer for iOS, living branch of archived EthanLipnik's MeshKit
+
 
 **This project wouldn't be possible without the awesome work from [Moving Parts](https://movingparts.io/gradient-meshes) and their [Swift Playground](https://github.com/movingparts-io/Gradient-Meshes-with-SceneKit)**
 
