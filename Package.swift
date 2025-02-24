@@ -17,7 +17,7 @@ let package = Package(
             targets: ["MeshKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/rogerioth/MeshGradient.git", from: "1.1.2"),
+        .package(url: "https://github.com/rogerioth/MeshGradient.git", from: "1.1.3"),
         .package(url: "https://github.com/rogerioth/RandomColorSwift.git", from: "2.0.1"),
         .package(url: "https://github.com/Quick/Quick.git", from: "4.0.0"), // Quick
         .package(url: "https://github.com/Quick/Nimble.git", from: "9.0.0"), // Nimble
