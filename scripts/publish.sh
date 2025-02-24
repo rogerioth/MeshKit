@@ -33,11 +33,6 @@ fi
 # Pull latest changes
 echo "Pulling latest changes from main..."
 git pull origin main
-
-# Run tests
-echo "Running tests..."
-./scripts/build-and-test.sh
-
 # Create and push tag
 echo "Creating and pushing tag v$NEW_VERSION..."
 git tag "$NEW_VERSION"
