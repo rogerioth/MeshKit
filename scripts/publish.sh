@@ -40,8 +40,8 @@ echo "Running tests..."
 
 # Create and push tag
 echo "Creating and pushing tag v$NEW_VERSION..."
-git tag "v$NEW_VERSION"
-git push origin "v$NEW_VERSION"
+git tag "$NEW_VERSION"
+git push origin "$NEW_VERSION"
 
 echo "✨ Successfully published version $NEW_VERSION!"
 echo "Package can now be used with: "

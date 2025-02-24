@@ -21,7 +21,7 @@ Your browser does not support the video tag.
 Add the following line to your package dependencies in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/rogerioth/meshkit.git", from: "1.0.0")
+.package(url: "https://github.com/rogerioth/meshkit.git", from: "0.4.4")
 ```
 
 Or add it directly through Xcode:
