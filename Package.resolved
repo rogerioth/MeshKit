@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/rogerioth/MeshGradient.git",
       "state" : {
-        "revision" : "f269dbcd8a4e2dcf77b126341d5ee992973a5ff6",
-        "version" : "1.1.0"
+        "revision" : "ea70753e908f5919514b30eb9cd38e8ac84f967b",
+        "version" : "1.1.1"
       }
     },
     {
