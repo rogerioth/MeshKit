@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -53,7 +53,6 @@
 				B9945C24EBFACC6E8D9D2E75CEA0B95F /* ContentView.swift */,
 				8574BC20CC3E19C5ABE1E369D1FA80F4 /* MeshKitSampleApp.swift */,
 			);
-			name = Sources;
 			path = Sources;
 			sourceTree = "<group>";
 		};
@@ -115,11 +114,9 @@
 				Base,
 			);
 			mainGroup = BA66F9B70FA59D699026DDD42913B178;
-			minimizedProjectReferenceProxies = 0;
 			packageReferences = (
-				A69043C8AE4DE5B752DEF625DCDCE95E /* XCLocalSwiftPackageReference ".." */,
+				A69043C8AE4DE5B752DEF625DCDCE95E /* XCLocalSwiftPackageReference "../.." */,
 			);
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 6E1CB67CFBD8401FBEDC9B6E7E7FDC90 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -158,12 +155,17 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 693YX79L7U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.meshkit.MeshKitSample;
@@ -298,12 +300,17 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 693YX79L7U;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.meshkit.MeshKitSample;
@@ -340,7 +347,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		A69043C8AE4DE5B752DEF625DCDCE95E /* XCLocalSwiftPackageReference ".." */ = {
+		A69043C8AE4DE5B752DEF625DCDCE95E /* XCLocalSwiftPackageReference "../.." */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../..;
 		};
@@ -349,7 +356,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		8818E5AAC11EB53E7DD657AA36CF1516 /* MeshKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A69043C8AE4DE5B752DEF625DCDCE95E /* XCLocalSwiftPackageReference ".." */;
+			package = A69043C8AE4DE5B752DEF625DCDCE95E /* XCLocalSwiftPackageReference "../.." */;
 			productName = MeshKit;
 		};
 /* End XCSwiftPackageProductDependency section */

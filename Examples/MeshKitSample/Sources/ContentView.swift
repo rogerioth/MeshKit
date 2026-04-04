@@ -58,25 +58,36 @@ struct ContentView: View {
     @State private var motionAmount = 0.18
     @State private var turbulenceAmount = 0.14
     @State private var colorDrift = true
+    @State private var isShowingFullscreenMesh = false
+    @State private var animatedMeshSeed = UUID()
 
     var body: some View {
         GeometryReader { geometry in
-            let isCompact = geometry.size.width < compactLayoutBreakpoint
+            ZStack {
+                let isCompact = geometry.size.width < compactLayoutBreakpoint
 
-            ScrollView(scrollAxes(isCompact: isCompact), showsIndicators: false) {
-                if isCompact {
-                    content(isCompact: true)
-                        .padding(16)
-                        .frame(maxWidth: .infinity, alignment: .top)
-                } else {
-                    content(isCompact: false)
-                        .padding(24)
-                        .frame(maxWidth: .infinity, alignment: .top)
-                        .frame(minWidth: 760, minHeight: 860, alignment: .top)
+                ScrollView(scrollAxes(isCompact: isCompact), showsIndicators: false) {
+                    if isCompact {
+                        content(isCompact: true)
+                            .padding(16)
+                            .frame(maxWidth: .infinity, alignment: .top)
+                    } else {
+                        content(isCompact: false)
+                            .padding(24)
+                            .frame(maxWidth: .infinity, alignment: .top)
+                            .frame(minWidth: 760, minHeight: 860, alignment: .top)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .background(background.ignoresSafeArea())
+
+                if isShowingFullscreenMesh {
+                    fullscreenMeshView
+                        .transition(.opacity)
+                        .zIndex(1)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(background.ignoresSafeArea())
+            .animation(.easeInOut(duration: 0.2), value: isShowingFullscreenMesh)
         }
     }
 
@@ -100,32 +111,47 @@ struct ContentView: View {
                         .stroke(panelStrokeColor, lineWidth: 1)
                 )
 
-            VStack(alignment: .leading, spacing: 12) {
-                Text(demoMode.title)
-                    .font(.headline)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(Capsule().fill(badgeFillColor))
-                    .overlay(Capsule().stroke(panelStrokeColor, lineWidth: 1))
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        featureChip(demoMode.title)
-                        featureChip(palette.displayTitle)
-                        featureChip(meshDensity.title)
-                        if demoMode == .animated {
-                            featureChip("\(Int(animationFramesPerSecond)) FPS")
-                            if colorDrift {
-                                featureChip("Color Drift")
-                            }
-                        }
-                    }
-                }
-                .frame(maxWidth: isCompact ? .infinity : 340, alignment: .leading)
-            }
-            .padding(16)
+            meshCanvasOverlay(
+                isCompact: isCompact,
+                isFullscreen: false,
+                action: { isShowingFullscreenMesh = true }
+            )
         }
         .frame(maxWidth: .infinity, minHeight: isCompact ? 340 : 460)
+    }
+
+    private var fullscreenMeshView: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .topLeading) {
+                background.ignoresSafeArea()
+
+                meshDisplay
+                    .ignoresSafeArea()
+
+                meshCanvasOverlay(
+                    isCompact: geometry.size.width < compactLayoutBreakpoint,
+                    isFullscreen: true,
+                    action: { isShowingFullscreenMesh = false }
+                )
+                .padding(.top, geometry.safeAreaInsets.top + 16)
+                .padding(.horizontal, 16)
+
+                VStack {
+                    Spacer()
+
+                    panelCard(spacing: 8) {
+                        Text("Fullscreen Mesh")
+                            .font(.headline.weight(.semibold))
+                        Text(fullscreenSummary)
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: 520)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, geometry.safeAreaInsets.bottom + 16)
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -151,6 +177,7 @@ struct ContentView: View {
                 grainAlpha: Float(grainAlpha),
                 subdivisions: Int(subdivisions)
             )
+            .id(animatedMeshSeed)
         }
     }
 
@@ -346,6 +373,50 @@ struct ContentView: View {
             .foregroundColor(.secondary)
     }
 
+    private func meshCanvasOverlay(
+        isCompact: Bool,
+        isFullscreen: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(demoMode.title)
+                    .font(.headline)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(Capsule().fill(badgeFillColor))
+                    .overlay(Capsule().stroke(panelStrokeColor, lineWidth: 1))
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        featureChip(demoMode.title)
+                        featureChip(palette.displayTitle)
+                        featureChip(meshDensity.title)
+                        if demoMode == .animated {
+                            featureChip("\(Int(animationFramesPerSecond)) FPS")
+                            if colorDrift {
+                                featureChip("Color Drift")
+                            }
+                        }
+                        if isFullscreen {
+                            featureChip("Expanded")
+                        }
+                    }
+                }
+                .frame(maxWidth: isCompact ? .infinity : 340, alignment: .leading)
+            }
+
+            Spacer(minLength: 0)
+
+            iconActionButton(
+                systemImage: isFullscreen ? "xmark" : "arrow.up.left.and.arrow.down.right",
+                title: isFullscreen ? "Close" : (isCompact ? "Fullscreen" : nil),
+                action: action
+            )
+        }
+        .padding(16)
+    }
+
     private var animatedControls: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Animated Mesh")
@@ -493,6 +564,17 @@ struct ContentView: View {
         }
     }
 
+    private var fullscreenSummary: String {
+        switch demoMode {
+        case .preview:
+            return "Preview mode scales the current mesh to the full screen."
+        case .editor:
+            return "Editor mode stays live in fullscreen, so you can drag control points with more room."
+        case .animated:
+            return "Animate mode keeps the active MeshAnimator configuration while the mesh fills the screen."
+        }
+    }
+
     private func featureChip(_ label: String) -> some View {
         Text(label)
             .font(.caption.weight(.semibold))
@@ -500,6 +582,37 @@ struct ContentView: View {
             .padding(.vertical, 6)
             .background(Capsule().fill(panelFillColor))
             .overlay(Capsule().stroke(panelStrokeColor, lineWidth: 1))
+    }
+
+    private func iconActionButton(
+        systemImage: String,
+        title: String? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: systemImage)
+                    .font(.headline.weight(.semibold))
+
+                if let title {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                }
+            }
+            .foregroundColor(.primary)
+            .padding(.horizontal, title == nil ? 12 : 14)
+            .padding(.vertical, 11)
+            .background(
+                Capsule()
+                    .fill(badgeFillColor)
+            )
+            .overlay(
+                Capsule()
+                    .stroke(panelStrokeColor, lineWidth: 1)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+        .accessibilityLabel(title ?? "Toggle fullscreen mesh")
     }
 
     private func sectionTitle(_ text: String) -> some View {
@@ -575,11 +688,16 @@ struct ContentView: View {
             size: meshDensity.size,
             randomizeLocations: randomizeLocations
         )
+        restartAnimatedMesh()
     }
 
     private func randomizePaletteAndMesh() {
         palette = Hue.randomPalette(includesMonochrome: false)
         regenerateMesh()
+    }
+
+    private func restartAnimatedMesh() {
+        animatedMeshSeed = UUID()
     }
 
     private static func makeMesh(
