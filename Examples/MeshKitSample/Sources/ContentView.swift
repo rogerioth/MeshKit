@@ -37,6 +37,8 @@ private enum MeshDensity: Int, CaseIterable, Hashable {
 }
 
 struct ContentView: View {
+    private let compactLayoutBreakpoint: CGFloat = 700
+
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var demoMode: DemoMode = .editor
@@ -58,19 +60,45 @@ struct ContentView: View {
     @State private var colorDrift = true
 
     var body: some View {
-        VStack(spacing: 20) {
-            canvas
-            controls
+        GeometryReader { geometry in
+            let isCompact = geometry.size.width < compactLayoutBreakpoint
+
+            ScrollView(scrollAxes(isCompact: isCompact), showsIndicators: false) {
+                if isCompact {
+                    content(isCompact: true)
+                        .padding(16)
+                        .frame(maxWidth: .infinity, alignment: .top)
+                } else {
+                    content(isCompact: false)
+                        .padding(24)
+                        .frame(maxWidth: .infinity, alignment: .top)
+                        .frame(minWidth: 760, minHeight: 860, alignment: .top)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(background.ignoresSafeArea())
         }
-        .padding(24)
-        .frame(minWidth: 760, minHeight: 860)
-        .background(background.ignoresSafeArea())
     }
 
-    private var canvas: some View {
+    private func scrollAxes(isCompact: Bool) -> Axis.Set {
+        isCompact ? .vertical : [.horizontal, .vertical]
+    }
+
+    private func content(isCompact: Bool) -> some View {
+        VStack(spacing: isCompact ? 16 : 20) {
+            canvas(isCompact: isCompact)
+            controls(isCompact: isCompact)
+        }
+    }
+
+    private func canvas(isCompact: Bool) -> some View {
         ZStack(alignment: .topLeading) {
             meshDisplay
                 .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(panelStrokeColor, lineWidth: 1)
+                )
 
             VStack(alignment: .leading, spacing: 12) {
                 Text(demoMode.title)
@@ -93,11 +121,11 @@ struct ContentView: View {
                         }
                     }
                 }
-                .frame(maxWidth: 340)
+                .frame(maxWidth: isCompact ? .infinity : 340, alignment: .leading)
             }
             .padding(16)
         }
-        .frame(maxWidth: .infinity, minHeight: 460)
+        .frame(maxWidth: .infinity, minHeight: isCompact ? 340 : 460)
     }
 
     @ViewBuilder
@@ -126,93 +154,68 @@ struct ContentView: View {
         }
     }
 
-    private var controls: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("MeshKit Sample")
-                        .font(.title.weight(.semibold))
-                    Text(demoMode.detail)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
+    @ViewBuilder
+    private func controls(isCompact: Bool) -> some View {
+        if isCompact {
+            compactControls
+        } else {
+            regularControls
+        }
+    }
 
-                Spacer()
-
-                HStack(spacing: 10) {
-                    actionButton(title: "Random Palette", accent: false, action: randomizePaletteAndMesh)
-                    actionButton(title: "Regenerate Mesh", accent: true, action: regenerateMesh)
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 10) {
-                sectionTitle("Mode")
-                Picker("Mode", selection: $demoMode) {
-                    ForEach(DemoMode.allCases, id: \.self) { mode in
-                        Text(mode.title).tag(mode)
-                    }
-                }
-                .pickerStyle(SegmentedPickerStyle())
-            }
-
-            VStack(alignment: .leading, spacing: 10) {
-                sectionTitle("Seed Mesh")
-
-                HStack(spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Palette")
-                            .font(.headline)
-                        Picker("Palette", selection: $palette) {
-                            ForEach(Hue.allCases, id: \.self) { hue in
-                                Text(hue.displayTitle).tag(hue)
-                            }
-                        }
-                        #if os(macOS)
-                        .pickerStyle(MenuPickerStyle())
-                        #else
-                        .pickerStyle(MenuPickerStyle())
-                        #endif
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Grid")
-                            .font(.headline)
-                        Picker("Grid", selection: $meshDensity) {
-                            ForEach(MeshDensity.allCases, id: \.self) { density in
-                                Text(density.title).tag(density)
-                            }
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
-                    }
-                }
-
-                Toggle("Randomize control point locations when regenerating", isOn: $randomizeLocations)
-            }
-
-            VStack(alignment: .leading, spacing: 12) {
-                sectionTitle("Render")
-
-                sliderRow(
-                    title: "Subdivisions",
-                    value: Int(subdivisions).description,
-                    slider: Slider(value: $subdivisions, in: 8...36, step: 1)
-                )
-
-                sliderRow(
-                    title: "Grain Alpha",
-                    value: String(format: "%.2f", grainAlpha),
-                    slider: Slider(value: $grainAlpha, in: 0...0.12, step: 0.01)
-                )
-            }
+    private var regularControls: some View {
+        panelCard(spacing: 18) {
+            controlsHeader(isCompact: false)
+            modeSection
+            seedMeshSection(isCompact: false)
+            renderSection
 
             if demoMode == .animated {
                 animatedControls
             }
 
-            Text(statusSummary)
-                .font(.footnote)
-                .foregroundColor(.secondary)
+            statusText
         }
+    }
+
+    private var compactControls: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            panelCard {
+                controlsHeader(isCompact: true)
+            }
+
+            panelCard(spacing: 10) {
+                modeSection
+            }
+
+            panelCard {
+                seedMeshSection(isCompact: true)
+            }
+
+            panelCard {
+                renderSection
+            }
+
+            if demoMode == .animated {
+                panelCard {
+                    animatedControls
+                }
+            }
+
+            panelCard(spacing: 8) {
+                statusText
+            }
+        }
+    }
+
+    private func panelCard<Content: View>(
+        spacing: CGFloat = 12,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: spacing) {
+            content()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
@@ -222,6 +225,125 @@ struct ContentView: View {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(panelStrokeColor, lineWidth: 1)
         )
+    }
+
+    @ViewBuilder
+    private func controlsHeader(isCompact: Bool) -> some View {
+        if isCompact {
+            VStack(alignment: .leading, spacing: 14) {
+                titleBlock(compact: true)
+
+                VStack(spacing: 10) {
+                    actionButton(title: "Regenerate Mesh", accent: true, fillWidth: true, action: regenerateMesh)
+                    actionButton(title: "Random Palette", accent: false, fillWidth: true, action: randomizePaletteAndMesh)
+                }
+            }
+        } else {
+            HStack(alignment: .firstTextBaseline) {
+                titleBlock(compact: false)
+
+                Spacer()
+
+                HStack(spacing: 10) {
+                    actionButton(title: "Random Palette", accent: false, action: randomizePaletteAndMesh)
+                    actionButton(title: "Regenerate Mesh", accent: true, action: regenerateMesh)
+                }
+            }
+        }
+    }
+
+    private func titleBlock(compact: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("MeshKit Sample")
+                .font((compact ? Font.title2 : Font.title).weight(.semibold))
+            Text(demoMode.detail)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        }
+    }
+
+    private var modeSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle("Mode")
+            Picker("Mode", selection: $demoMode) {
+                ForEach(DemoMode.allCases, id: \.self) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+        }
+    }
+
+    private func seedMeshSection(isCompact: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Seed Mesh")
+
+            if isCompact {
+                VStack(alignment: .leading, spacing: 14) {
+                    palettePicker
+                    gridPicker
+                }
+            } else {
+                HStack(spacing: 16) {
+                    palettePicker
+                    gridPicker
+                }
+            }
+
+            Toggle("Randomize control point locations when regenerating", isOn: $randomizeLocations)
+        }
+    }
+
+    private var palettePicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Palette")
+                .font(.headline)
+            Picker("Palette", selection: $palette) {
+                ForEach(Hue.allCases, id: \.self) { hue in
+                    Text(hue.displayTitle).tag(hue)
+                }
+            }
+            .pickerStyle(MenuPickerStyle())
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var gridPicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Grid")
+                .font(.headline)
+            Picker("Grid", selection: $meshDensity) {
+                ForEach(MeshDensity.allCases, id: \.self) { density in
+                    Text(density.title).tag(density)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var renderSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Render")
+
+            sliderRow(
+                title: "Subdivisions",
+                value: Int(subdivisions).description,
+                slider: Slider(value: $subdivisions, in: 8...36, step: 1)
+            )
+
+            sliderRow(
+                title: "Grain Alpha",
+                value: String(format: "%.2f", grainAlpha),
+                slider: Slider(value: $grainAlpha, in: 0...0.12, step: 0.01)
+            )
+        }
+    }
+
+    private var statusText: some View {
+        Text(statusSummary)
+            .font(.footnote)
+            .foregroundColor(.secondary)
     }
 
     private var animatedControls: some View {
@@ -400,8 +522,36 @@ struct ContentView: View {
         }
     }
 
-    private func actionButton(title: String, accent: Bool, action: @escaping () -> Void) -> some View {
+    private func actionButton(
+        title: String,
+        accent: Bool,
+        fillWidth: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
+            buttonLabel(title: title, accent: accent, fillWidth: fillWidth)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    @ViewBuilder
+    private func buttonLabel(title: String, accent: Bool, fillWidth: Bool) -> some View {
+        if fillWidth {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.primary)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(accent ? primaryButtonFillColor : buttonFillColor)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(accent ? primaryButtonStrokeColor : buttonStrokeColor, lineWidth: 1)
+                )
+        } else {
             Text(title)
                 .font(.headline)
                 .foregroundColor(.primary)
@@ -416,7 +566,6 @@ struct ContentView: View {
                         .stroke(accent ? primaryButtonStrokeColor : buttonStrokeColor, lineWidth: 1)
                 )
         }
-        .buttonStyle(PlainButtonStyle())
     }
 
     private func regenerateMesh() {
