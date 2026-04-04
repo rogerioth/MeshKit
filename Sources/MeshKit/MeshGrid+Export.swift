@@ -8,8 +8,9 @@
 import Foundation
 import MeshGradient
 import CoreGraphics
+import ImageIO
 import MetalKit
-import GLKit
+import QuartzCore
 import Accelerate
 import UniformTypeIdentifiers
 
@@ -66,13 +67,6 @@ extension MeshColorGrid {
 }
 
 extension MTLTexture {
-
-    #if os(iOS)
-    typealias XImage = UIImage
-    #elseif os(macOS)
-    typealias XImage = NSImage
-    #endif
-
     func makeImage(colorSpace: CGColorSpace? = nil) -> CGImage? {
         assert(self.pixelFormat == .bgra8Unorm)
 

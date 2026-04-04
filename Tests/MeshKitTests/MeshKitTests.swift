@@ -3,22 +3,30 @@ import XCTest
 
 final class MeshKitTests: XCTestCase {
 
-    func testExportMesh() {
-        self.measure(metrics: [XCTMemoryMetric()]) {
-            let exp = expectation(description: "Finished")
-            Task {
-                let mesh = MeshKit.generate(palette: .randomPalette(), luminosity: .bright, size: .init(width: 5, height: 5))
-                do {
-                    let url = try await mesh.export(size: .init(width: 720, height: 720), colorSpace: .init(name: CGColorSpace.displayP3))
-                    print(url.path)
-                } catch {
-                    print(error)
-                }
+    func testGenerateReturnsRequestedGridSize() {
+        let mesh = MeshKit.generate(palette: .purple, size: .init(width: 4, height: 4))
 
-                exp.fulfill()
-            }
+        XCTAssertEqual(mesh.width, 4)
+        XCTAssertEqual(mesh.height, 4)
+    }
 
-            wait(for: [exp], timeout: 200.0)
-        }
+    func testMeshColorCodableRoundTripPreservesValues() throws {
+        let original = MeshColor(
+            startLocation: .init(x: 0.0, y: 1.0),
+            location: .init(x: 0.2, y: 0.8),
+            color: SystemColor(red: 0.25, green: 0.5, blue: 0.75, alpha: 1.0),
+            tangent: .init(
+                u: .init(x: 0.1, y: 0.0),
+                v: .init(x: 0.0, y: -0.1)
+            )
+        )
+
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(MeshColor.self, from: data)
+
+        XCTAssertEqual(decoded.startLocation, original.startLocation)
+        XCTAssertEqual(decoded.location, original.location)
+        XCTAssertEqual(decoded.tangent, original.tangent)
+        XCTAssertEqual(decoded.color.asSimd(), original.color.asSimd())
     }
 }

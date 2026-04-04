@@ -1,13 +1,13 @@
 # MeshKit
 
-A powerful and easy to use live mesh gradient renderer for iOS, living branch of archived EthanLipnik's MeshKit
+A powerful and easy to use live mesh gradient renderer for iOS, macOS, and Mac Catalyst, living branch of archived EthanLipnik's MeshKit
 
 
 **This project wouldn't be possible without the awesome work from [Moving Parts](https://movingparts.io/gradient-meshes) and their [Swift Playground](https://github.com/movingparts-io/Gradient-Meshes-with-SceneKit)**
 
 ## What is MeshKit?
 
-MeshKit is an easy to use live mesh gradient renderer for iOS. In just a few lines of code, you can create a mesh gradient.
+MeshKit is an easy to use live mesh gradient renderer for Apple platforms. In just a few lines of code, you can create a mesh gradient.
 
 <video width="640" height="480" controls>
     <source src="media/sample.mov" type="video/mp4">
@@ -60,6 +60,22 @@ Or add it directly through Xcode:
 
 The snippet above will generate the effect seen in the video demo.
 
+## Sample App
+
+A cross-platform SwiftUI sample app is included in [`Examples/MeshKitSample`](Examples/MeshKitSample).
+
+To regenerate the sample Xcode project:
+
+```bash
+ruby scripts/generate-sample-project.rb
+```
+
+To open the sample in Xcode:
+
+```bash
+open Examples/MeshKitSample/MeshKitSample.xcodeproj
+```
+
 ### Rendering with MeshView
 MeshView is at the core of MeshKit, encapsulating an SCNView with enhanced capabilities to render mesh gradients efficiently. It's straightforward to use:
 
@@ -101,8 +117,8 @@ The project includes several utility scripts in the `scripts` directory to help 
 
 ### Available Scripts
 
-- `build.sh`: Builds the project
-- `build-and-test.sh`: Builds the project and runs all tests
+- `build.sh`: Builds the Swift package and sample app for macOS, iOS Simulator, and Mac Catalyst
+- `build-and-test.sh`: Runs the multi-platform builds and then runs all tests
 - `setup-environment.sh`: Sets up the development environment
 - `publish.sh`: Helps publish new versions of the package
 
@@ -129,6 +145,7 @@ The publish script will:
 
 - iOS 14.0+
 - macOS 11.0+
+- Mac Catalyst 14.0+
 - Xcode 13.0+
 - Swift 5.7+
 

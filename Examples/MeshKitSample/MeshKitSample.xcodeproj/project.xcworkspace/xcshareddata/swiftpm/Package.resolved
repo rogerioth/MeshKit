@@ -1,0 +1,24 @@
+{
+  "originHash" : "2a42e18f1a37d99d7930241008cfa011dd5f8d74fd1e95735768cd080799a905",
+  "pins" : [
+    {
+      "identity" : "meshgradient",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rogerioth/MeshGradient.git",
+      "state" : {
+        "revision" : "6cd8017698dc982312ff67b45377fc097083698b",
+        "version" : "1.1.3"
+      }
+    },
+    {
+      "identity" : "randomcolorswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rogerioth/RandomColorSwift.git",
+      "state" : {
+        "revision" : "ab01c6eff99f40c5e23ffcb957eb3971f937f106",
+        "version" : "2.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}
